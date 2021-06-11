@@ -1,5 +1,14 @@
 const $arena = document.querySelector('.arenas');
 const $randomButton = document.querySelector('.button');
+const $formFight = document.querySelector('.control');
+
+const HIT = {
+   head: 30,
+   body: 25,
+   foot: 20,
+}
+
+const ATTACK = ['head', 'body', 'foot'];
 
 const player1 = {
    player: 1,
@@ -7,12 +16,10 @@ const player1 = {
    hp: 100,
    img: 'http://reactmarathon-api.herokuapp.com/assets/subzero.gif',
    weapon: ['spoon', 'fork'],
-   attack: function() {
-      console.log(name + 'Fight...');
-   },
-   changeHP: changeHP,
-   elHP: elHP,
-   renderHP: renderHP,
+   attack,
+   changeHP,
+   elHP,
+   renderHP,
 };
 
 const player2 = {
@@ -21,14 +28,13 @@ const player2 = {
    hp: 100,
    img: 'http://reactmarathon-api.herokuapp.com/assets/sonya.gif',
    weapon: ['rollingPin', 'fryingPan'],
-   attack: function() {
-      console.log(name + 'Fight...');
-   },
-   changeHP: changeHP,
-   elHP: elHP,
-   renderHP: renderHP,
+   attack,
+   changeHP,
+   elHP,
+   renderHP,
 };
 
+//--- Создание элемента DOM ----
 function createElement(tag, className) {
    const $tag = document.createElement(tag);
 
@@ -79,6 +85,10 @@ function createPlayer(playerObj) {
    return $player;
 }
 
+function attack() {
+   console.log(this.name + 'Fight...');
+}
+
 //--- Изменение HP ----
 function changeHP(num) {
    this.hp -= num;
@@ -98,6 +108,7 @@ function renderHP(elem) {
    elem.style.width = `${this.hp}%`;
 }
 
+//--- Создание победившего игрока ----
 function playerWin(name) {
    const $winTitle = createElement('div', 'loseTitle');
 
@@ -110,14 +121,54 @@ function playerWin(name) {
    return $winTitle;
 }
 
-$randomButton.addEventListener('click', function() {
-   player1.changeHP(getRandomNum(1, 20));
-   const $player1Life = player1.elHP();
-   player1.renderHP($player1Life);
+//--- Получение случайного числа в диапазоне ----
+function getRandomNum(a, b) {
+   return Math.floor(Math.random() * (b - a + 1)) + a;
+}
 
-   player2.changeHP(getRandomNum(1, 20));
-   const $player2Life = player2.elHP();
-   player2.renderHP($player2Life);
+$arena.appendChild(createPlayer(player1));
+$arena.appendChild(createPlayer(player2));
+
+//--- Создание атакующих значений ----
+function enemyAttack() {
+   const hit = ATTACK[getRandomNum(0, 2)];
+   const defence = ATTACK[getRandomNum(0, 2)];
+
+   return {
+      value: getRandomNum(1, HIT[hit]),
+      hit,
+      defence,
+   }
+}
+
+$formFight.addEventListener('submit', function(event) {
+   event.preventDefault();
+   
+   const enemy = enemyAttack();
+   const attack = {};
+
+   for (let item of $formFight) {
+      if (item.checked && item.name === 'hit') {
+         attack.value = getRandomNum(1, HIT[item.value]);
+         attack.hit = item.value;
+      }
+
+      if (item.checked && item.name === 'defence') {
+         attack.defence = item.value;
+      }
+
+      item.checked = false;
+   }
+
+//--- Проверка не попадания в защиту для player1 ----
+   if (enemy.defence !== attack.hit) {
+      makeChange(player1, enemy.value);
+   }
+
+//--- Проверка не попадания в защиту для player2 ----
+   if (attack.defence !== enemy.hit) {
+      makeChange(player2, attack.value);
+   }
 
    if (player1.hp === 0 || player2.hp === 0) {
       $randomButton.disabled = true;
@@ -133,10 +184,9 @@ $randomButton.addEventListener('click', function() {
    }
 });
 
-function getRandomNum(a, b) {
-   return Math.floor(Math.random() * (b - a + 1)) + a;
+//--- Изменение HP игрока ----
+function makeChange(plr, value) {
+   plr.changeHP(value);
+   const $playerLife = plr.elHP();
+   plr.renderHP($playerLife);
 }
-
-$arena.appendChild(createPlayer(player1));
-$arena.appendChild(createPlayer(player2));
-
