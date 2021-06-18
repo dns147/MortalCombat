@@ -13,14 +13,14 @@ export const createElement = (tag, className) => {
 };
 
 //--- Изменение HP игрока ----
-export function makeChangeHP(plr, value) {
+export const makeChangeHP = (plr, value) => {
     plr.changeHP(value);
     const $playerLife = plr.elHP();
     plr.renderHP($playerLife);
 }
  
 //--- Получение времени ----
-export function getDate() {
+export const getDate = () => {
     let date = new Date();
     let min = date.getMinutes();
  
