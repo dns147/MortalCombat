@@ -16,7 +16,7 @@ class Game {
       });
 
       this.fightBase = new Request({
-         url: 'http://reactmarathon-api.herokuapp.com/api/mk/player/fight',
+         url: 'https://reactmarathon-api.herokuapp.com/api/mk/player/fight',
       });      
       
       //--- Получение выбранного игрока из localStorage ----
