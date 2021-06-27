@@ -25,6 +25,7 @@ export class Player {
    //--- Перерисовка элемента HP ----
    renderHP = (elem) => {
       elem.style.width = `${this.hp}%`;
+      elem.classList.add('anim');
    }
 
    //--- Создание игрока ----

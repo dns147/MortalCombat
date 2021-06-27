@@ -1,3 +1,5 @@
+const $parent = document.querySelector('.parent');
+
 //--- Получение случайного числа в диапазоне ----
 export const getRandomNum = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
 
@@ -17,7 +19,7 @@ export const makeChangeHP = (plr, value) => {
     plr.changeHP(value);
     const $playerLife = plr.elHP();
     plr.renderHP($playerLife);
-}
+};
  
 //--- Получение времени ----
 export const getDate = () => {
@@ -29,7 +31,7 @@ export const getDate = () => {
     } else {
        return `${date.getHours()}:0${date.getMinutes()}`;
     }
-}
+};
 
 
 

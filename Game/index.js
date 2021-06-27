@@ -1,8 +1,49 @@
 import { getRandomNum, createElement, makeChangeHP, getDate } from '../utils/index.js';
-import { $formFight, $chat, $randomButton, $arena, player1, player2, HIT, ATTACK, LOGS } from '../constans/index.js';
+import { $formFight, $chat, $randomButton, $arena, HIT, LOGS } from '../constans/index.js';
+import { Player } from '../Player/index.js';
+import { Request } from '../Request/index.js';
 
 class Game {
-   constructor(props) {
+   constructor() {
+      this.player1 = null;
+      this.player2 = null;
+      this.fightBase = null;
+   }
+
+   start = async() => {
+      const enemyBase = new Request({
+         url: 'https://reactmarathon-api.herokuapp.com/api/mk/players',
+      });
+
+      this.fightBase = new Request({
+         url: 'http://reactmarathon-api.herokuapp.com/api/mk/player/fight',
+      });      
+      
+      //--- Получение выбранного игрока из localStorage ----
+      const player = JSON.parse(localStorage.getItem('player1'));
+
+      //--- Выбор врага случайным образом ----
+      const enemies = await enemyBase.getPlayers();
+      const enemy = enemies[getRandomNum(0, enemies.length - 1)];
+
+      this.player1 = new Player({
+         ...player,
+         player: 1,
+         rootSelector: 'arenas',
+      });
+
+      this.player2 = new Player({
+         ...enemy,
+         player: 2,
+         rootSelector: 'arenas',
+      });
+
+      this.player1.createPlayer();
+      this.player2.createPlayer();
+   
+      this.generateLogs('start', this.player2, this.player1);
+
+      this.handleEvent();
    }
 
    //--- Создание кнопки Restart ----
@@ -15,7 +56,7 @@ class Game {
       $reloadDiv.appendChild($reloadButton);
 
       $reloadButton.addEventListener('click', function() {
-         window.location.reload();
+         window.location.pathname = 'index.html';
       });
    }
 
@@ -32,19 +73,7 @@ class Game {
       return $winTitle;
    }
 
-   //--- Параметры атаки врага ----
-   enemyAttack = () => {
-      const hit = ATTACK[getRandomNum(0, 2)];
-      const defence = ATTACK[getRandomNum(0, 2)];
-
-      return {
-         value: getRandomNum(1, HIT[hit]),
-         hit,
-         defence,
-      }
-   }
-
-   //--- Параметры атаки игрока ----
+   //--- Параметры атаки выбранного из localStorage игрока ----
    playerAttack = () => {
       const attack = {};
 
@@ -106,8 +135,8 @@ class Game {
 
    //--- Получение результата атаки ----
    showResult = () => {
-      const { name: name1, hp: hp1 } = player1;
-      const { name: name2, hp: hp2 } = player2;
+      const { name: name1, hp: hp1 } = this.player1;
+      const { name: name2, hp: hp2 } = this.player2;
 
       if (hp1 === 0 || hp2 === 0) {
          $randomButton.disabled = true;
@@ -116,13 +145,13 @@ class Game {
 
       if (hp1 === 0 && hp1 < hp2) {
          $arena.appendChild(this.playerWin(name2));
-         this.generateLogs('end', player2, player1);
+         this.generateLogs('end', this.player2, this.player1);
       } else if (hp2 === 0 && hp2 < hp1) {
          $arena.appendChild(this.playerWin(name1));
-         this.generateLogs('end', player1, player2);
+         this.generateLogs('end', this.player1, this.player2);
       } else if (hp1 === 0 && hp2 === 0) {
          $arena.appendChild(this.playerWin());
-         this.generateLogs('draw');
+         this.generateLogs('draw', {}, {});
       }   
    }
 
@@ -130,39 +159,33 @@ class Game {
    handleEvent = () => {
       const that = this;
 
-      $formFight.addEventListener('submit', function(event) {
+      $formFight.addEventListener('submit', async function(event) {
          event.preventDefault();
 
-         const {hit: hitEnemy, defence: defenceEnemy, value: valueEnemy} = that.enemyAttack();
-         const {hit: hitPlayer, defence: defencePlayer, value: valuePlayer} = that.playerAttack();
-         
+         //--- Параметры атаки врага, выбираются случайным образом ----
+         const fight = await that.fightBase.fight();
+
+         const {value: valuePlayer, hit: hitPlayer, defence: defencePlayer} = that.playerAttack();
+         const {value: valueEnemy, hit: hitEnemy, defence: defenceEnemy} = fight.player2;
+                  
          //--- Проверка не попадания в защиту для player1 ----
          if (defencePlayer !== hitEnemy) {
-            makeChangeHP(player1, valueEnemy);
-            that.generateLogs('hit', player2, player1, valueEnemy);
+            makeChangeHP(that.player1, valueEnemy);
+            that.generateLogs('hit', that.player2, that.player1, valueEnemy);
          } else {
-            that.generateLogs('defence', player2, player1);
+            that.generateLogs('defence', that.player2, that.player1);
          }
       
          //--- Проверка не попадания в защиту для player2 ----
          if (defenceEnemy !== hitPlayer) {
-            makeChangeHP(player2, valuePlayer);
-            that.generateLogs('hit', player1, player2, valuePlayer);
+            makeChangeHP(that.player2, valuePlayer);
+            that.generateLogs('hit', that.player1, that.player2, valuePlayer);
          } else {
-            that.generateLogs('defence', player1, player2);
+            that.generateLogs('defence', that.player1, that.player2);
          }
       
          that.showResult();
       });
-   }
-
-   start = () => {
-      player1.createPlayer();
-      player2.createPlayer();
-   
-      this.generateLogs('start', player2, player1);
-
-      this.handleEvent();
    }
 }
 

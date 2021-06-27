@@ -1,25 +1,7 @@
-import { Player } from '../Player/index.js';
-
 export const $chat = document.querySelector('.chat');
 export const $formFight = document.querySelector('.control');
 export const $randomButton = document.querySelector('.button');
 export const $arena = document.querySelector('.arenas');
-
-export const player1 = new Player ({
-   player: 1,
-   name: 'SUBZERO',
-   hp: 100,
-   img: 'http://reactmarathon-api.herokuapp.com/assets/subzero.gif',
-   rootSelector: 'arenas',
-});
-
-export const player2 = new Player ({
-   player: 2,
-   name: 'SONYA',
-   hp: 100,
-   img: 'http://reactmarathon-api.herokuapp.com/assets/sonya.gif',
-   rootSelector: 'arenas',
-});
 
 export const HIT = {
    head: 30,
