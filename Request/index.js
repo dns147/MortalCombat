@@ -7,7 +7,7 @@ export class Request {
       this.url = props.url;
    }
 
-   getPlayers = async() => fetch(this.url).then(res => res.json());
+   getPlayers = () => fetch(this.url).then(res => res.json());
 
    fight = async() => {
       const hit = ATTACK[getRandomNum(0, 2)];
