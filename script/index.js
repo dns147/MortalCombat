@@ -60,7 +60,7 @@ async function init() {
             el.classList.add('active');
 
             setTimeout(() => {
-                window.location.pathname = 'html/arenas.html';
+                window.location.pathname = 'mortalcombat/html/arenas.html';
             }, 1000);
         });
 
