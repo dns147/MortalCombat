@@ -60,7 +60,7 @@ async function init() {
             el.classList.add('active');
 
             setTimeout(() => {
-                window.location.pathname = 'MortalCombat/html/arenas.html';
+                window.location.pathname = 'https://dns147.github.io/MortalCombat/html/arenas.html';
             }, 1000);
         });
 
