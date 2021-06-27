@@ -56,7 +56,7 @@ class Game {
       $reloadDiv.appendChild($reloadButton);
 
       $reloadButton.addEventListener('click', function() {
-         window.location.pathname = 'index.html';
+         window.location.pathname = 'MortalCombat/index.html';
       });
    }
 
