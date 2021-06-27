@@ -60,7 +60,7 @@ async function init() {
             el.classList.add('active');
 
             setTimeout(() => {
-                window.location.pathname = 'arenas.html';
+                window.location.pathname = 'html/arenas.html';
             }, 1000);
         });
 
